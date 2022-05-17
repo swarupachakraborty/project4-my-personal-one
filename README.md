@@ -1,5 +1,7 @@
 # project4
 
+Group 17 - Abi Mangalan, Jay Sharma, Swarupa Chakraborty
+
 # Uranium
 
 ## Scalable URL Shortner Project Requirement
