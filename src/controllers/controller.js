@@ -1,4 +1,3 @@
-const { findOne } = require('../models/urlModel');
 const urlModel = require('../models/urlModel');
 
 const shortenURL = async function(req,res)
