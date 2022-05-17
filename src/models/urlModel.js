@@ -5,8 +5,7 @@ const urlSchema=  mongoose.Schema(
         urlCode :   {  
                         type:String,
                         required:true, 
-                        unique:true, 
-                        lowercase:true, 
+                        unique:true,  
                         trim:true   
                     }, 
         longUrl :   {  
@@ -22,4 +21,4 @@ const urlSchema=  mongoose.Schema(
     {timestamps:true}
 );
 
-module.exports=mongoose.models('urls',urlSchema);
+module.exports=mongoose.model('urls',urlSchema);
