@@ -1,6 +1,6 @@
 const urlModel = require('../models/urlModel');
 const redis = require('redis');
-const { promisify } = require('util');
+const { promisify }  = require('util');
 
 const redisClient = redis.createClient(
     11718,
@@ -33,6 +33,12 @@ const shortenURL = async function(req,res)
 
         const longUrl = req.body.originalUrl;
 
+        let urlExists = await urlModel.findOne({longUrl});
+
+        if(urlExists)
+
+            return res.status(201).send({status : true, data : urlExists});
+
         let characters = 'ABCDEFGHIJKLMNOPQRSTUWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         
         let length = 5;
@@ -49,7 +55,7 @@ const shortenURL = async function(req,res)
 
         await urlModel.create(urlData);
 
-        return res.status(201).send({status : true, data : urlData})
+        return res.status(201).send({status : true, data : urlData});
             
     }
     catch(error)
