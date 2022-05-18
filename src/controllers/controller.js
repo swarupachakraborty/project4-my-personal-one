@@ -5,7 +5,7 @@ const { promisify }  = require('util');
 const redisClient = redis.createClient(
     11718,
     "redis-11718.c301.ap-south-1-1.ec2.cloud.redislabs.com",
-    { no_ready_check: true }
+    { no_ready_check : true }
 );
 
 redisClient.auth("w33nbMdiEAfivct4GwEqBujruMssxDZd", function (err) {
@@ -33,11 +33,17 @@ const shortenURL = async function(req,res)
 
         const longUrl = req.body.originalUrl;
 
+        let cachedUrlData = JSON.parse(await GET_ASYNC(`${longUrl}`));
+
+        if(cachedUrlData)
+
+            return res.status(301).send({status : true, message : "cache hit", data : cachedUrlData});
+
         let urlExists = await urlModel.findOne({longUrl});
 
         if(urlExists)
-
-            return res.status(201).send({status : true, data : urlExists});
+        
+            return res.status(201).send({status : true, message : "from db", data : urlExists});
 
         let characters = 'ABCDEFGHIJKLMNOPQRSTUWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         
@@ -54,6 +60,8 @@ const shortenURL = async function(req,res)
         const urlData = { longUrl, shortUrl, urlCode };
 
         await urlModel.create(urlData);
+
+        await SET_ASYNC(`${longUrl}`,JSON.stringify(urlData));
 
         return res.status(201).send({status : true, data : urlData});
             
@@ -78,17 +86,17 @@ const getURL = async function(req,res)
 
         if(cachedUrlData)
 
-            return res.status(301).send({status  : true, data : cachedUrlData.longUrl});
+            return res.status(301).redirect(cachedUrlData.longUrl);
 
         const originalURL = await urlModel.findOne({urlCode});
 
         if(!originalURL)
 
             return res.status(404).send({status : false, message : "URL not found !"});
-        
-        await SET_ASYNC(`${req.params.urlCode}`, JSON.stringify(originalURL));
 
-        return res.status(301).send({status  : true, data : originalURL.longUrl});
+        await SET_ASYNC(`${urlCode}`,JSON.stringify(originalURL));
+
+        return res.status(301).redirect(originalURL.longUrl);
     }
     catch(error)
     {
