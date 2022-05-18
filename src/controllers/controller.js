@@ -68,11 +68,11 @@ const getURL = async function(req,res)
 
             return res.status(400).send({status : false, message : "Invalid request parameter. Please provide urlCode"});
         
-        let cahcedUrlData = JSON.parse(await GET_ASYNC(`${req.params.urlCode}`));
+        let cachedUrlData = JSON.parse(await GET_ASYNC(`${req.params.urlCode}`));
 
-        if(cahcedUrlData)
+        if(cachedUrlData)
 
-            return res.status(301).send({status  : true, data : cahcedUrlData.longUrl});
+            return res.status(301).send({status  : true, data : cachedUrlData.longUrl});
 
         const originalURL = await urlModel.findOne({urlCode});
 
