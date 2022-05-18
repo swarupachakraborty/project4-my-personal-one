@@ -7,9 +7,9 @@ const app = express();
 
 app.use(bodyParser.json());
 
-mongoose.connect("mongodb+srv://Project-4-Group:IvNdD8kd9i8LDhph@cluster0.w5bka.mongodb.net/group17Database")
-        .then(()=>console.log("Mongodb connected"))
-        .catch(err => console.log(err));
+mongoose.connect("mongodb+srv://Project-4-Group:IvNdD8kd9i8LDhph@cluster0.w5bka.mongodb.net/group17Database",{useNewUrlParser: true})
+    .then(()=>console.log("Mongodb connected"))
+    .catch(err => console.log(err));
 
 app.use('/',router);
 

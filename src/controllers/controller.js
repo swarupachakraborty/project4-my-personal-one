@@ -1,4 +1,23 @@
 const urlModel = require('../models/urlModel');
+const redis = require('redis');
+const { promisify } = require('util');
+
+const redisClient = redis.createClient(
+    11718,
+    "redis-11718.c301.ap-south-1-1.ec2.cloud.redislabs.com",
+    { no_ready_check: true }
+);
+
+redisClient.auth("w33nbMdiEAfivct4GwEqBujruMssxDZd", function (err) {
+    if (err) throw err;
+});
+
+redisClient.on("connect", async function () {
+    console.log("Connected to Redis..");
+});
+
+const SET_ASYNC = promisify(redisClient.SET).bind(redisClient);
+const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);
 
 const shortenURL = async function(req,res)
 {
@@ -49,12 +68,20 @@ const getURL = async function(req,res)
 
             return res.status(400).send({status : false, message : "Invalid request parameter. Please provide urlCode"});
         
+        let cahcedUrlData = JSON.parse(await GET_ASYNC(`${req.params.urlCode}`));
+
+        if(cahcedUrlData)
+
+            return res.status(301).send({status  : true, data : cahcedUrlData.longUrl});
+
         const originalURL = await urlModel.findOne({urlCode});
 
         if(!originalURL)
 
             return res.status(404).send({status : false, message : "URL not found !"});
         
+        await SET_ASYNC(`${req.params.urlCode}`, JSON.stringify(originalURL));
+
         return res.status(301).send({status  : true, data : originalURL.longUrl});
     }
     catch(error)
