@@ -5,10 +5,12 @@ const shortenURL = async function(req,res)
     try
     {
         if(Object.keys(req.body).length==0)
+
             return res.status(400).send({status : false, message : "Bad request. Please provide original URL in the request body."});
 
         if(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/.test(req.body.originalURL))
-            return res.status(400).send({ status: false, message : "URL is not valid !"});
+        
+            return res.status(400).send({ status: false, message : "The given originalUrl is not valid URL!"});
 
         const longUrl = req.body.originalUrl;
 
@@ -22,7 +24,7 @@ const shortenURL = async function(req,res)
 
             urlCode+=characters.charAt(Math.floor(Math.random()*characters.length));
 
-        const shortUrl = "localhost:3000/"+urlCode;
+        const shortUrl = "http://localhost:3000/"+urlCode;
 
         const urlData = { longUrl, shortUrl, urlCode };
 
@@ -44,14 +46,16 @@ const getURL = async function(req,res)
         const urlCode = req.params.urlCode;
 
         if(!urlCode)
+
             return res.status(400).send({status : false, message : "Invalid request parameter. Please provide urlCode"});
         
         const originalURL = await urlModel.findOne({urlCode});
 
         if(!originalURL)
+
             return res.status(404).send({status : false, message : "URL not found !"});
         
-        return res.status(303).send({status  : true, data : originalURL.longUrl});
+        return res.status(301).send({status  : true, data : originalURL.longUrl});
     }
     catch(error)
     {
