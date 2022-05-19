@@ -3,12 +3,12 @@ const redis = require('redis');
 const { promisify }  = require('util');
 
 const redisClient = redis.createClient(
-    11718,
-    "redis-11718.c301.ap-south-1-1.ec2.cloud.redislabs.com",
+    10118,
+    "redis-10118.c212.ap-south-1-1.ec2.cloud.redislabs.com",
     { no_ready_check : true }
 );
 
-redisClient.auth("w33nbMdiEAfivct4GwEqBujruMssxDZd", function (err) {
+redisClient.auth("5jOEoWx8gMK79oGVQMkNayzQ0zCb5qTH", function (err) {
     if (err) throw err;
 });
 
@@ -16,7 +16,7 @@ redisClient.on("connect", async function () {
     console.log("Connected to Redis..");
 });
 
-const SET_ASYNC = promisify(redisClient.SET).bind(redisClient);
+const SET_ASYNC = promisify(redisClient.SETEX).bind(redisClient);
 const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);
 
 const shortenURL = async function(req,res)
@@ -26,6 +26,10 @@ const shortenURL = async function(req,res)
         if(Object.keys(req.body).length==0)
 
             return res.status(400).send({status : false, message : "Bad request. Please provide original URL in the request body."});
+
+        if(req.body.originalUrl==undefined&&typeof(req.body.originalUrl)!='string')
+
+            return res.status(400).send({status : false, message : "originalUrl is required and should be  a string."});
 
         if(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/.test(req.body.originalURL))
         
@@ -37,13 +41,15 @@ const shortenURL = async function(req,res)
 
         if(cachedUrlData)
 
-            return res.status(301).send({status : true, message : "cache hit", data : cachedUrlData});
+            return res.status(201).send({status : true, message : "cache hit", data : cachedUrlData});
 
         let urlExists = await urlModel.findOne({longUrl});
 
         if(urlExists)
-        
+        {
+            await SET_ASYNC(`${longUrl}`,30,JSON.stringify(urlExists));
             return res.status(201).send({status : true, message : "from db", data : urlExists});
+        }
 
         let characters = 'ABCDEFGHIJKLMNOPQRSTUWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         
@@ -61,7 +67,7 @@ const shortenURL = async function(req,res)
 
         await urlModel.create(urlData);
 
-        await SET_ASYNC(`${longUrl}`,JSON.stringify(urlData));
+        await SET_ASYNC(`${longUrl}`,30,JSON.stringify(urlData));
 
         return res.status(201).send({status : true, data : urlData});
             
@@ -81,6 +87,10 @@ const getURL = async function(req,res)
         if(!urlCode)
 
             return res.status(400).send({status : false, message : "Invalid request parameter. Please provide urlCode"});
+
+        if((urlCode.length!=5)&&!(/[^-]\w{5}/.test(urlCode)))
+
+            return res.status(400).send({status : false, message : "The given urlCode is invalid."});
         
         let cachedUrlData = JSON.parse(await GET_ASYNC(`${req.params.urlCode}`));
 
@@ -94,7 +104,7 @@ const getURL = async function(req,res)
 
             return res.status(404).send({status : false, message : "URL not found !"});
 
-        await SET_ASYNC(`${urlCode}`,JSON.stringify(originalURL));
+        await SET_ASYNC(`${urlCode}`,30,JSON.stringify(originalURL));
 
         return res.status(301).redirect(originalURL.longUrl);
     }
