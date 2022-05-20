@@ -23,7 +23,7 @@ const shortenURL = async function(req,res)
 {
     try
     {
-        if(Object.keys(req.body).length==0)
+        if(Object.keys(req.body).length!=1)
 
             return res.status(400).send({status : false, message : "Bad request. Please provide original URL in the request body."});
 
