@@ -27,7 +27,7 @@ const shortenURL = async function(req,res)
 
             return res.status(400).send({status : false, message : "Bad request. Please provide longUrl in the request body."});
 
-        if(req.body.longUrl==undefined&&typeof(req.body.longUrl)!='string')
+        if(req.body.longUrl==undefined||typeof(req.body.longUrl)!='string')
 
             return res.status(400).send({status : false, message : "longUrl is required and should be  a string."});
 
