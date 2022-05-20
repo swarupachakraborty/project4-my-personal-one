@@ -31,7 +31,7 @@ const shortenURL = async function(req,res)
 
             return res.status(400).send({status : false, message : "longUrl is required and should be  a string."});
 
-        if(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/.test(req.body.longUrl))
+        if(!(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/.test(req.body.longUrl)))
         
             return res.status(400).send({ status: false, message : "The given longUrl is not valid URL!"});
 
