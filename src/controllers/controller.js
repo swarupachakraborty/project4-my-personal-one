@@ -33,7 +33,7 @@ const shortenURL = async function(req,res)
 
         if(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/.test(req.body.longUrl))
         
-            return res.status(400).send({ status: false, message : "The given originalUrl is not valid URL!"});
+            return res.status(400).send({ status: false, message : "The given longUrl is not valid URL!"});
 
         const longUrl = req.body.longUrl;
 
