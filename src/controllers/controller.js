@@ -41,14 +41,14 @@ const shortenURL = async function(req,res)
 
         if(cachedUrlData)
 
-            return res.status(201).send({status : true, message : "cache hit", data : cachedUrlData});
+            return res.status(200).send({status : true, message : "cache hit", data : cachedUrlData});
 
         let urlExists = await urlModel.findOne({longUrl});
 
         if(urlExists)
         {
             await SET_ASYNC(`${longUrl}`,30,JSON.stringify(urlExists));
-            return res.status(201).send({status : true, message : "from db", data : urlExists});
+            return res.status(200).send({status : true, message : "from db", data : urlExists});
         }
 
         let characters = 'ABCDEFGHIJKLMNOPQRSTUWXYZabcdefghijklmnopqrstuvwxyz0123456789';
