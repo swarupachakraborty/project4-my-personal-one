@@ -48,7 +48,7 @@ const shortenURL = async function(req,res)
 
         if(urlExists)
         {
-            await SET_ASYNC(`${longUrl}`,30,JSON.stringify(urlExists));
+            await SET_ASYNC(`${longUrl}`,120,JSON.stringify(urlExists));
             return res.status(200).send({status : true, message : "from db", data : { longUrl : urlExists.longUrl, shortUrl : urlExists.shortUrl, urlCode : urlExists.urlCode }});
         }
 
@@ -68,7 +68,7 @@ const shortenURL = async function(req,res)
 
         await urlModel.create(urlData);
 
-        await SET_ASYNC(`${longUrl}`,30,JSON.stringify(urlData));
+        await SET_ASYNC(`${longUrl}`,120,JSON.stringify(urlData));
 
         return res.status(201).send({status : true, data : urlData});
             
@@ -105,7 +105,7 @@ const getURL = async function(req,res)
 
             return res.status(404).send({status : false, message : "URL not found !"});
 
-        await SET_ASYNC(`${urlCode}`,30,JSON.stringify(originalURL));
+        await SET_ASYNC(`${urlCode}`,120,JSON.stringify(originalURL));
 
         return res.status(301).redirect(originalURL.longUrl);
     }
