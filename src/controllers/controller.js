@@ -97,7 +97,7 @@ const getURL = async function(req,res)
 
         if(cachedUrlData)
 
-            return res.status(301).redirect(cachedUrlData.longUrl);
+            return res.redirect(301,cachedUrlData.longUrl);
 
         const originalURL = await urlModel.findOne({urlCode});
 
@@ -107,7 +107,7 @@ const getURL = async function(req,res)
 
         await SET_ASYNC(`${urlCode}`,120,JSON.stringify(originalURL));
 
-        return res.status(301).redirect(originalURL.longUrl);
+        return res.redirect(301,originalURL.longUrl);
     }
     catch(error)
     {
